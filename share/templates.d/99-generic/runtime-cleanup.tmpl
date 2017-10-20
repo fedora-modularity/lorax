@@ -7,7 +7,7 @@ remove usr/share/i18n
 ## not required packages installed as dependencies
 ## no perl besides s390x
 ## perl needed for powerpc-utils and fbset on PPC
-%if basearch not in ("ppc", "ppc64", "ppc64le", "s390x"):
+%if basearch not in ("ppc", "s390x"):
     removepkg perl*
 %endif
 ## no sound support, thanks
@@ -199,8 +199,7 @@ removefrom glibc /usr/libexec/* /usr/sbin/*
 removefrom glibc-common /etc/* /usr/bin/catchsegv /usr/bin/gencat
 removefrom glibc-common /usr/bin/getent
 removefrom glibc-common /usr/bin/locale /usr/bin/rpcgen /usr/bin/sprof
-# NB: we keep /usr/bin/localedef so anaconda can inspect payload locale info
-removefrom glibc-common /usr/bin/tzselect
+removefrom glibc-common /usr/bin/tzselect /usr/bin/localedef
 removefrom glibc-common /usr/libexec/* /usr/sbin/*
 removefrom gmp /usr/${libdir}/libgmpxx.* /usr/${libdir}/libmp.*
 removefrom gnome-bluetooth-libs /usr/${libdir}/libgnome-bluetooth*
@@ -255,7 +254,8 @@ removefrom mtools /etc/*
 removefrom ncurses /usr/bin/captoinfo /usr/bin/infocmp /usr/bin/infotocap
 removefrom ncurses /usr/bin/reset /usr/bin/tabs /usr/bin/tic /usr/bin/toe
 removefrom ncurses /usr/bin/tput /usr/bin/tset
-removefrom ncurses-libs /usr/${libdir}/libform* /usr/${libdir}/libmenu*
+removefrom ncurses-libs /usr/${libdir}/libform*
+removefrom ncurses-libs /usr/${libdir}/libmenu*
 removefrom ncurses-libs /usr/${libdir}/libpanel.* /usr/${libdir}/libtic*
 removefrom net-tools */bin/netstat */sbin/ether-wake */sbin/ipmaddr
 removefrom net-tools */sbin/iptunnel */sbin/mii-diag */sbin/mii-tool
