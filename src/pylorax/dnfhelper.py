@@ -80,7 +80,9 @@ class LoraxDownloadCallback(dnf.callback.DownloadProgress):
         self.downloads[nevra] = done
         self._update()
 
-    def start(self, total_files, total_size):
+    # dnf 2.5.0 adds a new argument, accept it if it is passed
+    # pylint: disable=arguments-differ
+    def start(self, total_files, total_size, total_drpms=0):
         self.total_files = total_files
         self.total_size = total_size
 

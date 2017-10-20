@@ -22,17 +22,12 @@ import os
 import sys
 import argparse
 
+from pylorax import vernum
+
+version = "{0}-{1}".format(os.path.basename(sys.argv[0]), vernum)
+
 def lorax_parser():
     """ Return the ArgumentParser for lorax"""
-
-    # get lorax version
-    try:
-        from pylorax import version
-        vernum = version.num
-    except ImportError:
-        vernum = "devel"
-
-    version = "{0}-{1}".format(os.path.basename(sys.argv[0]), vernum)
 
     parser = argparse.ArgumentParser(description="Create the Anaconda boot.iso")
 
@@ -110,6 +105,8 @@ def lorax_parser():
                           metavar="[repo]", help="Names of repos to disable")
     optional.add_argument("--rootfs-size", type=int, default=2,
                           help="Size of root filesystem in GiB. Defaults to 2.")
+    optional.add_argument("--noverifyssl", action="store_true", default=False,
+                          help="Do not verify SSL certificates")
 
     # add the show version option
     parser.add_argument("-V", help="show program's version number and exit",
@@ -287,5 +284,9 @@ def lmc_parser(dracut_default=""):
                         help="additional squashfs args")
     parser.add_argument("--timeout", default=None, type=int,
                         help="Cancel installer after X minutes")
+
+    # add the show version option
+    parser.add_argument("-V", help="show program's version number and exit",
+                      action="version", version=version)
 
     return parser

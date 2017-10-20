@@ -5,7 +5,7 @@
 remove usr/share/i18n
 
 ## not required packages installed as dependencies
-## no perl besides s390x
+## perl is needed on s390x
 ## perl needed for powerpc-utils and fbset on PPC
 %if basearch not in ("ppc", "s390x"):
     removepkg perl*
@@ -71,7 +71,7 @@ removepkg tigervnc-license ttmkfdir xml-common xorg-x11-font-utils
 removepkg xorg-x11-server-common yum-utils firewalld
 
 ## other removals
-remove /boot /home /media /opt /srv /tmp/*
+remove /home /media /opt /srv /tmp/*
 remove /usr/etc /usr/games /usr/local /usr/tmp
 remove /usr/share/doc /usr/share/info /usr/share/man /usr/share/gnome
 remove /usr/share/mime/application /usr/share/mime/audio /usr/share/mime/image
@@ -199,7 +199,8 @@ removefrom glibc /usr/libexec/* /usr/sbin/*
 removefrom glibc-common /etc/* /usr/bin/catchsegv /usr/bin/gencat
 removefrom glibc-common /usr/bin/getent
 removefrom glibc-common /usr/bin/locale /usr/bin/rpcgen /usr/bin/sprof
-removefrom glibc-common /usr/bin/tzselect /usr/bin/localedef
+# NB: we keep /usr/bin/localedef so anaconda can inspect payload locale info
+removefrom glibc-common /usr/bin/tzselect
 removefrom glibc-common /usr/libexec/* /usr/sbin/*
 removefrom gmp /usr/${libdir}/libgmpxx.* /usr/${libdir}/libmp.*
 removefrom gnome-bluetooth-libs /usr/${libdir}/libgnome-bluetooth*
@@ -254,8 +255,7 @@ removefrom mtools /etc/*
 removefrom ncurses /usr/bin/captoinfo /usr/bin/infocmp /usr/bin/infotocap
 removefrom ncurses /usr/bin/reset /usr/bin/tabs /usr/bin/tic /usr/bin/toe
 removefrom ncurses /usr/bin/tput /usr/bin/tset
-removefrom ncurses-libs /usr/${libdir}/libform*
-removefrom ncurses-libs /usr/${libdir}/libmenu*
+removefrom ncurses-libs /usr/${libdir}/libform* /usr/${libdir}/libmenu*
 removefrom ncurses-libs /usr/${libdir}/libpanel.* /usr/${libdir}/libtic*
 removefrom net-tools */bin/netstat */sbin/ether-wake */sbin/ipmaddr
 removefrom net-tools */sbin/iptunnel */sbin/mii-diag */sbin/mii-tool
@@ -330,6 +330,11 @@ removefrom ${product.name}-logos /usr/share/{firstboot,gnome-screensaver,kde4,pi
 runcmd find ${root} -name "*.pyo" -type f -delete
 runcmd find ${root} -name "*.pyc" -type f -exec ln -sf /dev/null {} \;
 
+## cleanup /boot/ leaving vmlinuz, and .*hmac files
+runcmd chroot ${root} find /boot \! -name "vmlinuz*" \
+                            -and \! -name ".vmlinuz*" \
+                            -and \! -name boot -delete
+
 ## remove any broken links in /etc or /usr
 ## (broken systemd service links lead to confusing noise at boot)
 ## NOTE: not checking /var because we want to keep /var/run
@@ -343,7 +348,7 @@ runcmd chroot ${root} find -L /etc /usr -xdev -type l -and \! -name "mtab" \
 removefrom gstreamer1 --allbut /usr/${libdir}/libgstbase-1.0.* \
                                /usr/${libdir}/libgstreamer-1.0.*
 removefrom gstreamer1-plugins-base --allbut \
-        /usr/${libdir}/libgst{app,audio,fft,pbutils,tag,video}-1.0.*
+        /usr/${libdir}/libgst{allocators,app,audio,badallocators,fft,pbutils,tag,video}-1.0.*
 
 ## We have enough geoip libraries, thanks
 removepkg geoclue2
