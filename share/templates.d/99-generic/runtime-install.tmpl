@@ -2,15 +2,55 @@
 <%page args="basearch, product"/>
 
 ## anaconda package
-installpkg anaconda-tui
+installpkg anaconda anaconda-widgets kexec-tools-anaconda-addon
+
 ## anaconda deps that aren't in the RPM
 installpkg tmux
-## Other available payloads
-installpkg microdnf
 
-## kernel and firmware
+## Other available payloads
+installpkg dnf
+
+#  exclude for modularity
+%if modular != 1:
+    ## for anaconda crash handling
+	installpkg gdb
+%endif
+
+# Other available payloads
+installpkg rpm-ostree ostree
+## speed up compression on multicore systems
+installpkg pigz
+
+# exclude for modularity
+%if modular != 1:
+    %if basearch != "s390x":
+        ## skip the firmware for sound, video, and scanners, none of which will
+        ## do much good for the installer. Also skip uhd-firmware which is not
+        ## even a kernel firmware package.
+        installpkg --optional *-firmware --except alsa* --except midisport-firmware \
+                               --except crystalhd-firmware --except ivtv-firmware \
+                               --except cx18-firmware --except iscan-firmware \
+                               --except uhd-firmware --except lulzbot-marlin-firmware
+        installpkg b43-openfwwf
+    %endif
+%endif
+
+## install all of the glibc langpacks since otherwise we get no locales
+installpkg glibc-all-langpacks
+
+
 installpkg kernel kernel-modules
-installpkg grubby
+
+## exclude kernel-modules-extra from modularity
+%if modular != 1:
+    installpkg kernel-modules-extra
+    installpkg grubby
+%endif
+
+%if modular != 1:
+    ## install all of the glibc langpacks since otherwise we get no locales
+    installpkg glibc-all-langpacks
+%endif
 
 ## arch-specific packages (bootloaders etc.)
 %if basearch == "aarch64":
@@ -31,9 +71,18 @@ installpkg grubby
 %endif
 %if basearch in ("i386", "x86_64"):
     installpkg biosdevname memtest86+ syslinux
+    # exclude in modularity
+    %if modular != 1:
+        installpkg grub2-tools grub2-tools-minimal grub2-tools-extra
+    %endif
 %endif
 %if basearch in ("ppc", "ppc64", "ppc64le"):
-    installpkg fbset hfsutils kernel-bootwrapper powerpc-utils-core
+    installpkg fbset hfsutils kernel-bootwrapper
+    %if modular == 1:
+        powerpc-utils-core
+    %else
+        ppc64-utils ppc64-diag
+    %endif
     installpkg grub2-tools grub2-tools-minimal grub2-tools-extra
     installpkg grub2-${basearch}
 %endif
@@ -41,22 +90,165 @@ installpkg grubby
     installpkg lsscsi s390utils-base s390utils-cmsfs-fuse
 %endif
 
+## yay, plymouth
+installpkg plymouth
+
 ## extra dracut modules
 installpkg anaconda-dracut dracut-network dracut-config-generic dracut-fips
+
+## rescue needs this
+installpkg cryptsetup
+
+## rpcbind or portmap needed by dracut nfs module
+installpkg rpcbind
 
 ## required for dracut
 installpkg kbd kbd-misc
 ## required for anaconda-dracut (img-lib etc.)
 installpkg tar xz curl bzip2
 
+## basic system stuff
+installpkg systemd-sysv systemd-units
+installpkg rsyslog
+
+## xorg/GUI packages
+%if basearch != "s390x":
+    installpkg xorg-x11-drivers
+
+    # exclude for modularity
+    %if modular != 1:
+        installpkg xorg-x11-server-Xorg
+    %endif
+%endif
+
+installpkg xorg-x11-xauth metacity
+
+%if modular != 1:
+    installpkg xorg-x11-server-utils
+    installpkg dbus-x11 gsettings-desktop-schemas
+    installpkg nm-connection-editor
+    installpkg librsvg2
+%endif
+
 ## filesystem tools
-installpkg xfsprogs
+installpkg xfsprogs jfsutils gfs2-utils
+installpkg system-storage-manager
+installpkg xfsdump
+
+## extra storage packages
+installpkg storaged storaged-iscsi
+
+## filesystem tools
+installpkg reiserfs-utils
+
+## exlucded in modularity
+%if modular != 1:
+    ## filesystem tools
+    installpkg btrfs-progs ntfs-3g ntfsprogs
+    installpkg device-mapper-persistent-data
+
+    ## extra libblockdev plugins
+    installpkg libblockdev-lvm-dbus
+
+    ## needed for LUKS escrow
+    installpkg volume_key
+    installpkg nss-tools
+%endif
 
 ## SELinux support
 installpkg selinux-policy-targeted
 
 ## network tools/servers
 installpkg nfs-utils
+installpkg bridge-utils
+installpkg nmap-ncat
+
+## hardware utilities/libraries
+installpkg ipmitool
+installpkg mt-st
+installpkg smartmontools
+installpkg usbutils
+installpkg hdparm
+installpkg rng-tools
+
+%if basearch not in ("aarch64", "ppc64le", "s390x"):
+    installpkg pcmciautils
+%endif
+
+## see bug #1483278
+%if basearch not in ("arm", "armhfp"):
+    installpkg libmlx4 rdma-core
+%endif
+
+## debugging/bug reporting tools
+installpkg fpaste
+
+## satisfy libnotify's desktop-notification-daemon with the least crazy option
+installpkg notification-daemon
+
+## Docker enabled boot.iso
+# Not all arches currently have docker
+%if basearch not in ("ppc", "ppc64", "s390"):
+    installpkg docker-anaconda-addon
+%endif
+
+# exclude for modularity
+%if modular != 1:
+    ## network tools/servers
+    installpkg ethtool openssh-server openssh-clients
+    installpkg tigervnc-server-minimal
+    %if basearch != "s390x":
+        installpkg tigervnc-server-module
+    %endif
+    installpkg net-tools
+
+    ## hardware utilities/libraries
+    installpkg pciutils
+
+    ## fonts & themes
+    installpkg bitmap-fangsongti-fonts
+    installpkg dejavu-sans-fonts dejavu-sans-mono-fonts
+    installpkg kacst-farsi-fonts
+    installpkg kacst-qurn-fonts
+    installpkg lklug-fonts
+    installpkg lohit-assamese-fonts
+    installpkg lohit-bengali-fonts
+    installpkg lohit-devanagari-fonts
+    installpkg lohit-gu*-fonts
+    installpkg lohit-kannada-fonts
+    installpkg lohit-odia-fonts
+    installpkg lohit-tamil-fonts
+    installpkg lohit-telugu-fonts
+    installpkg madan-fonts
+    installpkg nhn-nanum-gothic-fonts
+    installpkg smc-meera-fonts
+    installpkg thai-scalable-waree-fonts
+    installpkg vlgothic-fonts
+    installpkg wqy-microhei-fonts
+    installpkg sil-abyssinica-fonts
+    installpkg xorg-x11-fonts-misc
+    installpkg aajohan-comfortaa-fonts
+    installpkg abattis-cantarell-fonts
+    installpkg sil-scheherazade-fonts
+    installpkg jomolhari-fonts
+    installpkg khmeros-base-fonts
+    installpkg sil-padauk-fonts
+
+    ## debugging/bug reporting tools
+    installpkg gdb-gdbserver
+    installpkg libreport-plugin-bugzilla libreport-plugin-reportuploader
+
+    ## extra tools not required by anaconda
+    installpkg vim-minimal strace lsof dump xz less eject
+    installpkg wget rsync bind-utils ftp mtr vconfig
+    installpkg icfg spice-vdagent
+    installpkg gdisk hexedit sg3_utils
+%endif
+
+# only in modularity
+%if modular == 1:
+    installpkg libibverbs
+%endif
 
 ## actually install all the requested packages
 run_pkg_transaction
