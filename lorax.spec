@@ -3,7 +3,7 @@
 %define debug_package %{nil}
 
 Name:           lorax
-Version:        27.11.boltron.8
+Version:        27.11.boltron.9
 Release:        1%{?dist}
 Summary:        Tool for creating the anaconda install images
 
