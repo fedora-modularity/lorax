@@ -60,7 +60,7 @@ installpkg glibc-all-langpacks
 %endif
 
 ## yay, plymouth
-installpkg plymouth
+installpkg --optional plymouth
 
 ## extra dracut modules
 installpkg anaconda-dracut dracut-network dracut-config-generic dracut-fips
@@ -78,7 +78,7 @@ installpkg tar xz curl bzip2
 
 ## basic system stuff
 installpkg systemd-sysv systemd-units
-installpkg rsyslog
+installpkg --optional rsyslog
 
 ## xorg/GUI packages
 %if basearch != "s390x":
@@ -92,9 +92,9 @@ installpkg librsvg2
 ## filesystem tools
 installpkg xfsprogs e2fsprogs
 installpkg --optional btrfs-progs jfsutils reiserfs-utils gfs2-utils ntfs-3g ntfsprogs
-installpkg system-storage-manager
+installpkg --optional system-storage-manager
 installpkg device-mapper-persistent-data
-installpkg xfsdump
+installpkg --optional xfsdump
 
 ## extra storage packages
 installpkg udisks2 udisks2-iscsi
@@ -116,68 +116,68 @@ installpkg tigervnc-server-minimal
 installpkg tigervnc-server-module
 %endif
 installpkg net-tools
-installpkg bridge-utils
-installpkg nmap-ncat
+installpkg --optional bridge-utils
+installpkg --optional nmap-ncat
 
 ## hardware utilities/libraries
 installpkg pciutils
 %if basearch not in ("aarch64", "ppc64le", "s390x"):
-installpkg pcmciautils
+installpkg --optional pcmciautils
 %endif
 ## see bug #1483278
 %if basearch not in ("arm", "armhfp"):
-    installpkg libmlx4 rdma-core
+    installpkg --optional libmlx4 rdma-core
 %endif
-installpkg rng-tools
+installpkg --optional rng-tools
 
 ## fonts & themes
-installpkg bitmap-fangsongti-fonts
-installpkg dejavu-sans-fonts dejavu-sans-mono-fonts
-installpkg kacst-farsi-fonts
-installpkg kacst-qurn-fonts
-installpkg lklug-fonts
-installpkg lohit-assamese-fonts
-installpkg lohit-bengali-fonts
-installpkg lohit-devanagari-fonts
-installpkg lohit-gu*-fonts
-installpkg lohit-kannada-fonts
-installpkg lohit-odia-fonts
-installpkg lohit-tamil-fonts
-installpkg lohit-telugu-fonts
-installpkg madan-fonts
-installpkg nhn-nanum-gothic-fonts
-installpkg smc-meera-fonts
-installpkg thai-scalable-waree-fonts
-installpkg vlgothic-fonts
-installpkg wqy-microhei-fonts
-installpkg sil-abyssinica-fonts
-installpkg xorg-x11-fonts-misc
-installpkg aajohan-comfortaa-fonts
-installpkg abattis-cantarell-fonts
-installpkg sil-scheherazade-fonts
-installpkg jomolhari-fonts
-installpkg khmeros-base-fonts
-installpkg sil-padauk-fonts
+installpkg --optional bitmap-fangsongti-fonts
+installpkg --optional dejavu-sans-fonts dejavu-sans-mono-fonts
+installpkg --optional kacst-farsi-fonts
+installpkg --optional kacst-qurn-fonts
+installpkg --optional lklug-fonts
+installpkg --optional lohit-assamese-fonts
+installpkg --optional lohit-bengali-fonts
+installpkg --optional lohit-devanagari-fonts
+installpkg --optional lohit-gu*-fonts
+installpkg --optional lohit-kannada-fonts
+installpkg --optional lohit-odia-fonts
+installpkg --optional lohit-tamil-fonts
+installpkg --optional lohit-telugu-fonts
+installpkg --optional madan-fonts
+installpkg --optional nhn-nanum-gothic-fonts
+installpkg --optional smc-meera-fonts
+installpkg --optional thai-scalable-waree-fonts
+installpkg --optional vlgothic-fonts
+installpkg --optional wqy-microhei-fonts
+installpkg --optional sil-abyssinica-fonts
+installpkg --optional xorg-x11-fonts-misc
+installpkg --optional aajohan-comfortaa-fonts
+installpkg --optional abattis-cantarell-fonts
+installpkg --optional sil-scheherazade-fonts
+installpkg --optional jomolhari-fonts
+installpkg --optional khmeros-base-fonts
+installpkg --optional sil-padauk-fonts
 
 ## debugging/bug reporting tools
 installpkg gdb-gdbserver
 installpkg libreport-plugin-bugzilla libreport-plugin-reportuploader
-installpkg fpaste
+installpkg --optional fpaste
 
 ## extra tools not required by anaconda
 installpkg vim-minimal lsof xz less
 installpkg gdisk sg3_utils
 
 ## satisfy libnotify's desktop-notification-daemon with the least crazy option
-installpkg notification-daemon
+installpkg --optional notification-daemon
 
 ## Docker enabled boot.iso
 # Not all arches currently have docker
 %if basearch not in ("ppc", "ppc64", "s390"):
-    installpkg docker-anaconda-addon
+    installpkg --optional docker-anaconda-addon
 %endif
 
-installpkg libibverbs
+installpkg --optional libibverbs
 
 ## actually install all the requested packages
 run_pkg_transaction
